@@ -10,7 +10,7 @@ Measured on the delivered artifacts in this repo.
 | Duration (Part 1) | `135.000 s` = `8100` frames = **2:15** | ✅ |
 | Narration script | exact 283-word script from the brief (`public/script.txt`) | ✅ verbatim |
 | Subtitles | word-level WebVTT, **283** cues (`public/part1.vtt`) | ✅ |
-| Loudness | **-14.2 LUFS** integrated, **-1.2 dBTP** peak | ✅ (`-14` target) |
+| Loudness | master `-14.2 LUFS`; delivered MP4 measures **-13.9 LUFS / -1.1 dBTP** | ✅ (`-14` target) |
 | Voice chain | `highpass=f=85,equalizer=f=3200:t=q:w=1.5:g=2.5,loudnorm=I=-14:TP=-1.5:LRA=11` | ✅ exact command run |
 | UI cues | **31** mechanical clicks + **4** tape whooshes, generated with `ffmpeg` lavfi, delayed to every beat boundary | ✅ |
 | Beat cadence | 32 beats, **3.9 – 4.6 s** apart (fresh visual state or camera move each beat) | ✅ |
@@ -41,3 +41,21 @@ The prompt's `edge-tts` command is executed first, verbatim
 exactly 135.000 s with natural sentence pauses. On a connected machine the Edge
 command succeeds and the fallback never runs — `scripts/make_audio.py` prints
 which path was used and records it in `src/audio_meta.json`.
+
+## Final render (`out/part_1.mp4`)
+
+```
+h264 · 1920×1080 · 60/1 fps · 8100 frames · 135.000 s · 82 MB · 4.9 Mb/s
+aac  · 44.1 kHz · mono · 192 kb/s · 135.000 s
+```
+
+Frames were sampled out of the encoded file at 3 s, 22 s, 60 s, 90 s, 120 s and
+133 s to confirm the three plates, camera moves, captions and the end card all
+land as designed.
+
+### Known limitations
+
+* The voice is the offline fallback (see above), not `en-US-AndrewMultilingualNeural`.
+* `part1.mp3` is 135.024 s (MP3 frame padding); `part1_mix.wav` and the MP4 are
+  hard-trimmed to exactly 135.000 s.
+* Longest natural pause is ~2.5 s at the plate 01 → 02 boundary; the whoosh covers it.
