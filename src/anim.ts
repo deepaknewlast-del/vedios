@@ -32,3 +32,20 @@ export const fade = (v: number) => clamp01(v);
 
 export const stagger = (p: number, i: number, count: number) =>
   clamp01((p - (i / count) * 0.55) / 0.45);
+
+/** Springy pop used by the cartoon art: 0 before `at`, overshooting into place. */
+export const springIn = (
+  state: number,
+  at: number,
+  localFrame: number,
+  duration = 26,
+): number => {
+  if (state < at) return 0;
+  if (state > at) return 1;
+  return spring({
+    frame: Math.max(0, localFrame),
+    fps: FPS,
+    config: { damping: 11, stiffness: 160, mass: 0.7 },
+    durationInFrames: duration,
+  });
+};

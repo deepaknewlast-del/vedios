@@ -1,46 +1,55 @@
 import React from 'react';
 import { interpolate, useCurrentFrame } from 'remotion';
-import { fade, revealAt, stagger } from '../anim';
-import { CheckMark, ChunkyArrow, CrossMark, InkPanel, Stamp, Tag } from '../components/Ink';
-import { C, FONT_MONO, SHADOW_SM, tint } from '../theme';
-import { FigureLegend } from './SectionHeader';
+import { revealAt, springIn } from '../anim';
+import { AudienceRow, SeatedPerson } from '../art/People';
+import { Doodles } from '../art/Doodles';
+import {
+  Burst,
+  ComicPanel,
+  HandLabel,
+  SketchArrow,
+  Sparkle,
+  Star,
+} from '../art/Sketch';
+import { CheckMark, Stamp } from '../components/Ink';
+import { C, FONT_HEAD, FONT_MONO, SHADOW_SM, tint } from '../theme';
 import { BEATS, type Beat } from '../timeline';
 
-type Metric = { label: string; v: number; c: string };
+const keyFrames = BEATS.map((b) => b.startFrame);
+const focusA = BEATS.map((b) => (b.section.id === 'hook' && b.focus === 'A' ? 1 : 0));
+const focusB = BEATS.map((b) => (b.section.id === 'hook' && b.focus === 'B' ? 1 : 0));
+const opts = { extrapolateLeft: 'clamp' as const, extrapolateRight: 'clamp' as const };
 
-const A_METRICS: Metric[] = [
-  { label: 'ACCURACY', v: 100, c: C.teal },
-  { label: 'POISE', v: 100, c: C.tealLight },
-  { label: 'RECALL', v: 100, c: C.mustard },
-  { label: 'TIMING', v: 100, c: C.grey },
-];
-const B_METRICS: Metric[] = [
-  { label: 'ACCURACY', v: 92, c: C.teal },
-  { label: 'POISE', v: 88, c: C.tealLight },
-  { label: 'RECALL', v: 90, c: C.mustard },
-  { label: 'TIMING', v: 86, c: C.grey },
-];
+const PANEL_W = 806;
+const PANEL_H = 486;
 
-const MetricRow: React.FC<{ m: Metric; p: number }> = ({ m, p }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 11, height: 38 }}>
+/** Chunky cartoon gauge bar with a hand-drawn feel. */
+const Gauge: React.FC<{
+  label: string;
+  value: number;
+  color: string;
+  p: number;
+  width?: number;
+}> = ({ label, value, color, p, width = 250 }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8, opacity: Math.min(1, p * 1.6) }}>
     <div
       style={{
         fontFamily: FONT_MONO,
         fontWeight: 700,
-        fontSize: 15,
-        width: 112,
+        fontSize: 12,
+        width: 78,
         letterSpacing: 0.4,
       }}
     >
-      {m.label}
+      {label}
     </div>
     <div
       style={{
-        position: 'relative',
-        width: 288,
-        height: 21,
-        background: C.paper,
+        width,
+        height: 17,
+        background: C.white,
         border: `3px solid ${C.ink}`,
+        position: 'relative',
       }}
     >
       <div
@@ -49,235 +58,214 @@ const MetricRow: React.FC<{ m: Metric; p: number }> = ({ m, p }) => (
           left: 0,
           top: 0,
           bottom: 0,
-          width: `${m.v * p}%`,
-          background: m.c,
-          borderRight: `3px solid ${C.ink}`,
+          width: `${value * p}%`,
+          background: color,
+          borderRight: value > 2 ? `2px solid ${C.ink}` : undefined,
         }}
       />
-      {[25, 50, 75].map((t) => (
-        <div
-          key={t}
-          style={{
-            position: 'absolute',
-            left: `${t}%`,
-            top: 0,
-            bottom: 0,
-            width: 1,
-            background: tint(C.ink, 0.3),
-          }}
-        />
-      ))}
     </div>
-    <div
-      style={{
-        fontFamily: FONT_MONO,
-        fontWeight: 700,
-        fontSize: 15,
-        width: 44,
-        textAlign: 'right',
-      }}
-    >
-      {m.v}%
+    <div style={{ fontFamily: FONT_MONO, fontWeight: 700, fontSize: 12, width: 34 }}>
+      {Math.round(value)}%
     </div>
   </div>
 );
 
-const PANEL_H = 464;
-
-const Dossier: React.FC<{
+const CandidateCard: React.FC<{
   which: 'A' | 'B';
-  opacity: number;
   state: number;
   localFrame: number;
-}> = ({ which, opacity, state, localFrame }) => {
+  focus: number;
+  frame: number;
+}> = ({ which, state, localFrame, focus, frame }) => {
   const isA = which === 'A';
-  const metrics = isA ? A_METRICS : B_METRICS;
-  const p = revealAt(state, 0, localFrame - (isA ? 0 : 8), false, 30);
-  const stampAt = isA ? 2 : 4;
-  const stamp = revealAt(state, stampAt, localFrame, true, 30);
-  const verdictColor = isA ? C.salmon : C.teal;
+  const appear = revealAt(state, 0, localFrame - (isA ? 0 : 6), false, 32);
+  const stamp = revealAt(state, isA ? 2 : 4, localFrame, true, 30);
+  const accent = isA ? C.teal : C.salmon;
+  const bubble = revealAt(state, isA ? 1 : 3, localFrame, true, 30);
+  const breathe = Math.sin((frame + (isA ? 0 : 40)) / 34) * 0.012;
+
+  const gauges = isA
+    ? [
+        { label: 'ACCURACY', value: 100, color: C.teal, at: 1 },
+        { label: 'POISE', value: 100, color: C.mustard, at: 1 },
+        { label: 'WARMTH', value: 12, color: C.salmon, at: 2 },
+      ]
+    : [
+        { label: 'ACCURACY', value: 92, color: C.teal, at: 3 },
+        { label: 'POISE', value: 86, color: C.mustard, at: 3 },
+        { label: 'WARMTH', value: 78, color: '#4E9E8F', at: 4 },
+      ];
 
   return (
-    <div style={{ width: 744, height: 464, opacity: opacity * fade(p + 0.0001) }}>
-      <InkPanel style={{ width: 744, height: 464, padding: 0 }}>
+    <div
+      style={{
+        position: 'relative',
+        width: PANEL_W,
+        height: PANEL_H,
+        transform: `translateY(${(1 - appear) * 30}px) scale(${0.93 + appear * 0.07})`,
+        opacity: appear,
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          inset: -6,
+          border: `5px solid ${focus > 0.5 ? C.red : 'transparent'}`,
+          borderRadius: 6,
+          pointerEvents: 'none',
+        }}
+      />
+      <ComicPanel
+        title={`CANDIDATE ${which}`}
+        tag={isA ? 'ROBOTIC PERFECTION' : 'EQUALLY SHARP'}
+        number={isA ? 1 : 2}
+        bg={C.white}
+        style={{ width: PANEL_W, height: PANEL_H }}
+        barColor={isA ? C.ink : C.ink}
+      >
+        {/* accent wash */}
         <div
           style={{
-            height: 44,
-            background: C.ink,
-            color: C.white,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 16px',
-            fontFamily: FONT_MONO,
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 38,
+            height: 300,
+            background: tint(accent, 0.34),
+          }}
+        />
+        {/* hatch texture in the corner */}
+        <div
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 38,
+            width: 180,
+            height: 120,
+            backgroundImage: `repeating-linear-gradient(45deg, ${tint(C.ink, 0.06)} 0 3px, transparent 3px 9px)`,
+          }}
+        />
+
+        {/* character */}
+        <div style={{ position: 'absolute', left: 4, bottom: -4, transform: `scale(${1 + breathe})`, transformOrigin: 'bottom left' }}>
+          <SeatedPerson size={296} accent={accent} pose={isA ? 0.12 : 0.95} lean={isA ? 0 : -2} />
+        </div>
+
+        {/* speech bubble */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 246,
+            top: 54,
+            width: 330,
+            background: C.white,
+            border: `3px solid ${C.ink}`,
+            borderRadius: 22,
+            padding: '10px 15px',
+            boxShadow: SHADOW_SM,
+            fontFamily: FONT_HEAD,
             fontWeight: 700,
-            fontSize: 19,
-            letterSpacing: 1,
+            fontStyle: 'italic',
+            fontSize: 21,
+            lineHeight: 1.22,
+            transform: `scale(${0.7 + bubble * 0.3}) rotate(${(1 - bubble) * -6}deg)`,
+            opacity: bubble,
           }}
         >
-          <span>CANDIDATE {which}</span>
-          <span style={{ fontSize: 14, opacity: 0.85 }}>DOSSIER / {isA ? '01' : '02'}</span>
-        </div>
-
-        <div style={{ padding: '11px 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-            <div
-              style={{
-                width: 10,
-                height: 27,
-                background: verdictColor,
-                border: `3px solid ${C.ink}`,
-              }}
-            />
-            <div
-              style={{
-                fontFamily: FONT_MONO,
-                fontWeight: 700,
-                fontSize: 23,
-                letterSpacing: -0.4,
-              }}
-            >
-              {isA ? '100% FLAWLESS' : '88% + MINOR FLAW'}
-            </div>
-            <div style={{ flex: 1 }} />
-            <div
-              style={{
-                fontFamily: FONT_MONO,
-                fontSize: 12,
-                fontWeight: 700,
-                opacity: 0.58,
-                letterSpacing: 0.6,
-              }}
-            >
-              SELF-REPORT
-            </div>
-          </div>
-
-          <div style={{ height: 3, background: C.ink, margin: '9px 0 7px' }} />
-
-          {metrics.map((m, i) => (
-            <div key={m.label} style={{ opacity: stagger(p, i, metrics.length) }}>
-              <MetricRow m={m} p={stagger(p, i, metrics.length)} />
-            </div>
-          ))}
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-            <div style={{ fontFamily: FONT_MONO, fontWeight: 700, fontSize: 15, width: 112 }}>
-              ERRORS
-            </div>
-            {[0, 1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                style={{
-                  width: 34,
-                  height: 26,
-                  border: `3px solid ${C.ink}`,
-                  background: !isA && i === 2 ? C.salmon : C.paper,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {!isA && i === 2 ? (
-                  <span style={{ fontFamily: FONT_MONO, fontWeight: 700, fontSize: 15 }}>!</span>
-                ) : (
-                  <CheckMark size={15} color={tint(C.ink, 0.45)} />
-                )}
-              </div>
-            ))}
-            <div style={{ flex: 1 }} />
-            <div
-              style={{
-                fontFamily: FONT_MONO,
-                fontWeight: 700,
-                fontSize: 12,
-                letterSpacing: 0.4,
-                padding: '3px 8px',
-                border: `2px solid ${C.ink}`,
-                background: isA ? C.grey : C.salmon,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {isA ? 'ZERO LOGGED' : '1 LOGGED'}
-            </div>
-          </div>
-
+          {isA ? '“Every answer. Flawless.”' : '“I misread one number last quarter.”'}
           <div
             style={{
-              marginTop: 96,
-              borderTop: `3px solid ${C.ink}`,
-              paddingTop: 9,
-              display: 'flex',
-              justifyContent: 'space-between',
-              fontFamily: FONT_MONO,
-              fontWeight: 700,
-              fontSize: 12,
-              opacity: 0.62,
+              position: 'absolute',
+              left: 22,
+              bottom: -19,
+              width: 0,
+              height: 0,
+              borderLeft: '15px solid transparent',
+              borderRight: '15px solid transparent',
+              borderTop: `19px solid ${C.ink}`,
             }}
-          >
-            <span>PANEL NOTE / {isA ? 'NO ERRORS ADMITTED' : 'ONE ERROR ADMITTED, Q3'}</span>
-            <span>{isA ? '100 / 100' : '88 / 100'}</span>
-          </div>
+          />
+          <div
+            style={{
+              position: 'absolute',
+              left: 25,
+              bottom: -12,
+              width: 0,
+              height: 0,
+              borderLeft: '12px solid transparent',
+              borderRight: '12px solid transparent',
+              borderTop: `15px solid ${C.white}`,
+            }}
+          />
         </div>
 
+        {/* gauges */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 246,
+            top: 148,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 9,
+            background: tint(C.white, 0.9),
+            border: `3px dashed ${tint(C.ink, 0.5)}`,
+            padding: '9px 11px',
+          }}
+        >
+          {gauges.map((g) => (
+            <Gauge
+              key={g.label}
+              label={g.label}
+              value={g.value}
+              color={g.color}
+              p={revealAt(state, g.at, localFrame, true, 32)}
+              width={196}
+            />
+          ))}
+        </div>
+
+        {/* floating note */}
         <div
           style={{
             position: 'absolute',
             right: 18,
-            bottom: 14,
-            opacity: stamp,
-            zIndex: 2,
-            pointerEvents: 'none',
+            top: 42,
+            opacity: revealAt(state, isA ? 2 : 4, localFrame, true, 28),
           }}
         >
+          <div
+            style={{
+              background: isA ? C.salmon : C.mustard,
+              border: `3px solid ${C.ink}`,
+              boxShadow: SHADOW_SM,
+              padding: '6px 11px',
+              fontFamily: FONT_MONO,
+              fontWeight: 700,
+              fontSize: 13,
+              transform: 'rotate(3deg)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {isA ? 'ZERO ERRORS LOGGED' : '+ 1 HUMAN SLIP'}
+          </div>
+        </div>
+
+        {/* stamp */}
+        <div style={{ position: 'absolute', right: 22, bottom: 22, opacity: stamp, pointerEvents: 'none' }}>
           <Stamp
-            color={isA ? C.salmon : C.teal}
-            rotate={isA ? -12 : -9}
-            fontSize={34}
-            scale={0.86 + stamp * 0.14}
+            color={isA ? C.salmon : '#4E9E8F'}
+            rotate={isA ? -12 : -8}
+            fontSize={42}
+            scale={0.78 + stamp * 0.22}
           >
             {isA ? 'THREAT' : 'TRUSTED'}
           </Stamp>
         </div>
-      </InkPanel>
+      </ComicPanel>
     </div>
   );
 };
-
-const keyFrames = BEATS.map((b) => b.startFrame);
-const focusA = BEATS.map((b) => (b.section.id === 'hook' && b.focus === 'A' ? 1 : 0));
-const focusB = BEATS.map((b) => (b.section.id === 'hook' && b.focus === 'B' ? 1 : 0));
-const opts = { extrapolateLeft: 'clamp' as const, extrapolateRight: 'clamp' as const };
-
-const FocusBracket: React.FC<{ w: number; h: number; on: number }> = ({ w, h, on }) => (
-  <svg
-    width={w + 20}
-    height={h + 20}
-    viewBox={`0 0 ${w + 20} ${h + 20}`}
-    style={{
-      position: 'absolute',
-      left: -10,
-      top: -10,
-      pointerEvents: 'none',
-      opacity: on,
-    }}
-  >
-    {[
-      [1, 1, 1, 1],
-      [w + 19, 1, -1, 1],
-      [1, h + 19, 1, -1],
-      [w + 19, h + 19, -1, -1],
-    ].map(([x, y, dx, dy], i) => (
-      <path
-        key={i}
-        d={`M${x} ${y + dy * 40} L${x} ${y} L${x + dx * 40} ${y}`}
-        fill="none"
-        stroke={C.red}
-        strokeWidth={6}
-      />
-    ))}
-  </svg>
-);
 
 export const HookSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat, localFrame }) => {
   const frame = useCurrentFrame();
@@ -285,162 +273,186 @@ export const HookSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat
   const aFocus = interpolate(frame, keyFrames, focusA, opts);
   const bFocus = interpolate(frame, keyFrames, focusB, opts);
 
-  const logic = revealAt(state, 0, localFrame, false, 30);
-  const reality = revealAt(state, 6, localFrame, true);
-  const hostility = revealAt(state, 7, localFrame, true, 32);
-  const chips = ['OFFER', 'ALLIES', 'TRUST'].map((c, i) => ({
-    c,
-    p: revealAt(state, 6, localFrame - i * 5, true, 30),
-  }));
+  const outcome = revealAt(state, 6, localFrame, true, 34);
+  const hostility = revealAt(state, 7, localFrame, true, 34);
+  const arrowP = revealAt(state, 0, localFrame, false, 30);
+  const logicArrow = revealAt(state, 5, localFrame, true, 30);
+  const crowd = revealAt(state, 7, localFrame, true, 36);
 
   return (
     <div style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-        <div style={{ position: 'relative', width: 744, height: PANEL_H }}>
-          <div style={{ transform: 'rotate(-0.5deg)' }}>
-            <Dossier which="A" opacity={1} state={state} localFrame={localFrame} />
-          </div>
-          <FocusBracket w={744} h={PANEL_H} on={aFocus} />
-        </div>
-        <div
-          style={{
-            width: 58,
-            height: 58,
-            borderRadius: '50%',
-            background: C.ink,
-            color: C.white,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: FONT_MONO,
-            fontWeight: 700,
-            fontSize: 20,
-            flexShrink: 0,
-            boxShadow: SHADOW_SM,
-            transform: 'rotate(-6deg)',
-          }}
-        >
-          VS
-        </div>
-        <div style={{ position: 'relative', width: 744, height: PANEL_H }}>
-          <div style={{ transform: 'rotate(0.5deg)' }}>
-            <Dossier which="B" opacity={1} state={state} localFrame={localFrame} />
-          </div>
-          <FocusBracket w={744} h={PANEL_H} on={bFocus} />
-        </div>
-      </div>
-
-      <FigureLegend
-        items={[
-          { k: 'A', v: '100% FLAWLESS', c: C.teal },
-          { k: 'B', v: '88% + FLAW', c: C.salmon },
-          { k: 'VERDICT', v: 'THREAT vs TRUSTED', c: C.mustard },
+      <Doodles
+        seed={1}
+        spots={[
+          [1690, 690, 'gear', 62],
+          [1610, 760, 'sparkle', 30],
+          [40, 745, 'star', 26],
         ]}
-        note="FIG 1.1 / THE OFFER DOES NOT GO TO THE HIGHEST SCORE"
       />
 
-      {/* logic vs reality band */}
-      <div style={{ position: 'absolute', left: 0, top: 476, width: '100%', height: 140 }}>
-        <div
-          style={{
-            position: 'absolute',
-            left: 8,
-            top: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            opacity: logic * (state >= 6 ? 0.32 : 1),
-          }}
-        >
-          <Tag bg={C.mustard} size={19}>
-            LOGIC SAYS
-          </Tag>
-          <ChunkyArrow width={190} height={54} dir="left" color={C.mustard} />
-          <div style={{ fontFamily: FONT_MONO, fontWeight: 700, fontSize: 17 }}>A WINS</div>
+      <div
+        style={{
+          position: 'absolute',
+          left: 10,
+          top: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+        }}
+      >
+        <CandidateCard which="A" state={state} localFrame={localFrame} focus={aFocus} frame={frame} />
+
+        {/* VS badge */}
+        <div style={{ position: 'relative', width: 120, height: 120, flexShrink: 0 }}>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Burst size={158} color={C.mustard} spin={frame * 0.5} />
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: FONT_HEAD,
+              fontWeight: 700,
+              fontStyle: 'italic',
+              fontSize: 42,
+              color: C.ink,
+            }}
+          >
+            VS
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              left: 6,
+              top: -26,
+              transform: `scale(${0.6 + outcome * 0.4})`,
+              opacity: outcome,
+            }}
+          >
+            <Star size={30} color={C.salmon} rotate={14} />
+          </div>
         </div>
 
-        <div
-          style={{
-            position: 'absolute',
-            right: 8,
-            top: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            opacity: reality,
-          }}
-        >
-          <div style={{ fontFamily: FONT_MONO, fontWeight: 700, fontSize: 17 }}>B WINS</div>
-          <ChunkyArrow width={190} height={54} color={C.teal} />
-          <Tag bg={C.teal} size={19}>
-            IN REALITY
-          </Tag>
+        <CandidateCard which="B" state={state} localFrame={localFrame} focus={bFocus} frame={frame} />
+      </div>
+
+      {/* ---- outcome strip ---- */}
+      <div style={{ position: 'absolute', left: 10, top: 480, width: 1740, height: 150 }}>
+        <div style={{ position: 'absolute', left: 24, top: 40, opacity: arrowP * (state >= 6 ? 0.3 : 1) }}>
+          <SketchArrow w={200} color={C.mustard} rotate={-5} />
+        </div>
+        <div style={{ position: 'absolute', left: 26, top: 0, opacity: arrowP * (state >= 6 ? 0.55 : 1) }}>
+          <HandLabel size={24} rotate={-3} underline={false}>
+            LOGIC SAYS A WINS
+          </HandLabel>
         </div>
 
-        {state >= 6 && (
-          <div style={{ position: 'absolute', left: 214, top: 4, opacity: 0.9 }}>
-            <CrossMark size={30} color={C.red} />
+        {logicArrow > 0.2 && state >= 6 && (
+          <div style={{ position: 'absolute', left: 96, top: 54, opacity: logicArrow }}>
+            <div
+              style={{
+                fontFamily: FONT_HEAD,
+                fontWeight: 700,
+                fontSize: 54,
+                color: C.red,
+                transform: 'rotate(-12deg)',
+              }}
+            >
+              ✕
+            </div>
           </div>
         )}
 
-        {state >= 6 && (
-          <div style={{ position: 'absolute', left: 470, top: 0, display: 'flex', gap: 9 }}>
-            {chips.map(({ c, p }) => (
-              <div key={c} style={{ opacity: p, transform: `scale(${0.8 + p * 0.2})` }}>
-                <Tag bg={C.mustard} size={15} shadow={false}>
-                  {c}
-                </Tag>
+        {/* winner panel */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 560,
+            top: 0,
+            width: 620,
+            height: 96,
+            opacity: outcome,
+            transform: `scale(${0.8 + outcome * 0.2}) rotate(${(1 - outcome) * -3}deg)`,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <HandLabel size={30} rotate={-1.5}>
+            THE OFFER GOES TO CANDIDATE B
+          </HandLabel>
+          <div style={{ display: 'flex', gap: 10 }}>
+            {['THE OFFER', 'THE ALLIES', 'THE TRUST'].map((t, i) => (
+              <div
+                key={t}
+                style={{
+                  background: C.mustard,
+                  border: `3px solid ${C.ink}`,
+                  boxShadow: SHADOW_SM,
+                  padding: '6px 12px',
+                  fontFamily: FONT_MONO,
+                  fontWeight: 700,
+                  fontSize: 14,
+                  transform: `rotate(${i % 2 ? 2.6 : -2}deg)`,
+                }}
+              >
+                {t}
               </div>
             ))}
           </div>
-        )}
+        </div>
 
-        {/* hostility alert strip */}
+        <div style={{ position: 'absolute', right: 24, top: 34, opacity: outcome }}>
+          <SketchArrow w={200} color="#4E9E8F" rotate={4} flip />
+        </div>
+
+        {/* hostility row */}
         <div
           style={{
             position: 'absolute',
             left: 0,
-            top: 74,
-            width: '100%',
-            height: 54,
+            right: 0,
+            bottom: 2,
+            height: 62,
             opacity: hostility,
-            transform: `translateY(${(1 - hostility) * 10}px)`,
+            transform: `translateY(${(1 - hostility) * 12}px)`,
             display: 'flex',
             alignItems: 'center',
-            gap: 16,
+            gap: 14,
+            justifyContent: 'center',
           }}
         >
+          <AudienceRow count={6} width={210} ready={crowd} color={C.grey} />
           <div
             style={{
-              flex: 1,
-              height: 44,
+              background: C.salmon,
               border: `3px solid ${C.ink}`,
-              background: tint(C.salmon, 0.42),
               boxShadow: SHADOW_SM,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 14,
-              padding: '0 16px',
+              padding: '7px 14px',
               fontFamily: FONT_MONO,
               fontWeight: 700,
-              fontSize: 17,
-              letterSpacing: 0.6,
+              fontSize: 14.5,
+              letterSpacing: 0.3,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 9,
             }}
           >
-            <span
-              style={{
-                background: C.red,
-                width: 15,
-                height: 15,
-                display: 'inline-block',
-                border: `2px solid ${C.ink}`,
-              }}
-            />
-            CANDIDATE A SILENTLY TRIGGERS A ROOM FULL OF DEFENSIVE HOSTILITY
+            <span style={{ width: 11, height: 11, background: C.red, border: `2px solid ${C.ink}` }} />
+            A ROOM FULL OF DEFENSIVE HOSTILITY
           </div>
-          <Tag bg={C.salmon} size={15}>
-            THE THREAT SIGNAL
-          </Tag>
         </div>
       </div>
     </div>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Part 1 — Why Being Too Competent Makes People Secretly Resent You</title>
+<style>
+  :root { --paper:#F4EFE2; --ink:#181818; --teal:#8BB8B8; --mustard:#F2CA6B; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--paper); color: var(--ink);
+    font-family: "Space Mono", ui-monospace, Menlo, monospace;
+    background-image: linear-gradient(to right, #E0D8C8 1px, transparent 1px),
+                      linear-gradient(to bottom, #E0D8C8 1px, transparent 1px);
+    background-size: 32px 32px;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 28px 20px 48px;
+  }
+  h1 {
+    font-family: "Comic Neue", "Comic Sans MS", cursive; font-style: italic; font-weight: 700;
+    font-size: clamp(20px, 3vw, 34px); margin: 0 0 6px; text-align: center;
+  }
+  .sub { font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; opacity: .7; margin-bottom: 20px; text-align:center }
+  .frame {
+    width: min(1200px, 100%); border: 3px solid var(--ink); background: #000;
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  video { display: block; width: 100%; height: auto; background: #000; }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; justify-content: center; }
+  a.btn {
+    display: inline-block; padding: 9px 14px; border: 3px solid var(--ink); background: var(--mustard);
+    color: var(--ink); text-decoration: none; font-weight: 700; font-size: 13px; letter-spacing: .6px;
+    box-shadow: 3px 3px 0 var(--ink); text-transform: uppercase;
+  }
+  a.btn.alt { background: var(--teal); }
+  .meta { margin-top: 20px; font-size: 12px; line-height: 1.8; text-align: center; opacity: .75; max-width: 780px }
+</style>
+</head>
+<body>
+  <h1>Why Being Too Competent Makes People Secretly Resent You</h1>
+  <div class="sub">Theory of Behaviour · Part 1 of 4 · 2:15 · 1920×1080 / 60fps</div>
+
+  <div class="frame">
+    <video id="v" controls playsinline preload="metadata" poster="">
+      <source src="/out/part_1_preview.mp4" type="video/mp4" />
+      <track label="English" kind="subtitles" srclang="en" src="/public/part1.vtt" default />
+    </video>
+  </div>
+
+  <div class="bar">
+    <a class="btn" href="/out/part_1_preview.mp4" download>Download preview (720p)</a>
+    <a class="btn alt" href="/out/part_1.mp4" download>Download master (1080p60)</a>
+  </div>
+
+  <div class="meta">
+    01 HOOK 0:00–0:34 · 02 LAB / 1966 0:34–1:20 · 03 MATRIX 1:20–2:15 — subtitles are burned in via the VTT track.
+  </div>
+
+  <script>
+    const v = document.getElementById('v');
+    v.addEventListener('error', () => {
+      document.querySelector('.meta').textContent = 'Video failed to load: ' + (v.error && v.error.message);
+    });
+  </script>
+</body>
+</html>
