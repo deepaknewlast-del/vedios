@@ -86,14 +86,14 @@ const CandidateCard: React.FC<{
 
   const gauges = isA
     ? [
-        { label: 'ACCURACY', value: 100, color: C.teal, at: 1 },
-        { label: 'POISE', value: 100, color: C.mustard, at: 1 },
-        { label: 'WARMTH', value: 12, color: C.salmon, at: 2 },
+        { label: 'ACCURACY', value: 100, color: C.teal, at: 0 },
+        { label: 'POISE', value: 100, color: C.mustard, at: 0 },
+        { label: 'WARMTH', value: 12, color: C.salmon, at: 0 },
       ]
     : [
-        { label: 'ACCURACY', value: 92, color: C.teal, at: 3 },
-        { label: 'POISE', value: 86, color: C.mustard, at: 3 },
-        { label: 'WARMTH', value: 78, color: '#4E9E8F', at: 4 },
+        { label: 'ACCURACY', value: 92, color: C.teal, at: 0 },
+        { label: 'POISE', value: 86, color: C.mustard, at: 0 },
+        { label: 'WARMTH', value: 78, color: '#4E9E8F', at: 0 },
       ];
 
   return (
@@ -348,12 +348,12 @@ export const HookSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat
       </div>
 
       {/* ---- outcome strip ---- */}
-      <div style={{ position: 'absolute', left: 10, top: 480, width: 1740, height: 150 }}>
-        <div style={{ position: 'absolute', left: 24, top: 40, opacity: arrowP * (state >= 6 ? 0.3 : 1) }}>
-          <SketchArrow w={200} color={C.mustard} rotate={-5} />
+      <div style={{ position: 'absolute', left: 10, top: 498, width: 1740, height: 140 }}>
+        <div style={{ position: 'absolute', left: 22, top: 34, opacity: arrowP * (state >= 6 ? 0.3 : 1) }}>
+          <SketchArrow w={176} color={C.mustard} rotate={-5} />
         </div>
-        <div style={{ position: 'absolute', left: 26, top: 0, opacity: arrowP * (state >= 6 ? 0.55 : 1) }}>
-          <HandLabel size={24} rotate={-3} underline={false}>
+        <div style={{ position: 'absolute', left: 26, top: -2, opacity: arrowP * (state >= 6 ? 0.55 : 1) }}>
+          <HandLabel size={23} rotate={-3} underline={false}>
             LOGIC SAYS A WINS
           </HandLabel>
         </div>
@@ -378,10 +378,10 @@ export const HookSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat
         <div
           style={{
             position: 'absolute',
-            left: 560,
-            top: 0,
-            width: 620,
-            height: 96,
+            left: 556,
+            top: -6,
+            width: 640,
+            height: 86,
             opacity: outcome,
             transform: `scale(${0.8 + outcome * 0.2}) rotate(${(1 - outcome) * -3}deg)`,
             display: 'flex',
@@ -390,7 +390,7 @@ export const HookSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat
             gap: 8,
           }}
         >
-          <HandLabel size={30} rotate={-1.5}>
+          <HandLabel size={27} rotate={-1.5}>
             THE OFFER GOES TO CANDIDATE B
           </HandLabel>
           <div style={{ display: 'flex', gap: 10 }}>
@@ -414,45 +414,48 @@ export const HookSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat
           </div>
         </div>
 
-        <div style={{ position: 'absolute', right: 24, top: 34, opacity: outcome }}>
-          <SketchArrow w={200} color="#4E9E8F" rotate={4} flip />
+        <div style={{ position: 'absolute', right: 26, top: 30, opacity: outcome }}>
+          <SketchArrow w={176} color="#4E9E8F" rotate={4} flip />
         </div>
 
-        {/* hostility row */}
+        {/* hostility row: reacting crowd (left) + red banner (centre) */}
         <div
           style={{
             position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 2,
-            height: 62,
+            left: 236,
+            bottom: -8,
             opacity: hostility,
-            transform: `translateY(${(1 - hostility) * 12}px)`,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            justifyContent: 'center',
+            transform: `translateY(${(1 - hostility) * 12}px) scale(0.86)`,
+            transformOrigin: 'left bottom',
           }}
         >
-          <AudienceRow count={6} width={210} ready={crowd} color={C.grey} />
-          <div
-            style={{
-              background: C.salmon,
-              border: `3px solid ${C.ink}`,
-              boxShadow: SHADOW_SM,
-              padding: '7px 14px',
-              fontFamily: FONT_MONO,
-              fontWeight: 700,
-              fontSize: 14.5,
-              letterSpacing: 0.3,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 9,
-            }}
-          >
-            <span style={{ width: 11, height: 11, background: C.red, border: `2px solid ${C.ink}` }} />
-            A ROOM FULL OF DEFENSIVE HOSTILITY
-          </div>
+          <AudienceRow count={5} width={430} ready={crowd} color={C.grey} />
+        </div>
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: 92,
+            height: 44,
+            marginLeft: -14,
+            transform: `translateX(-50%) translateY(${(1 - hostility) * 12}px) rotate(-0.6deg)`,
+            opacity: hostility,
+            background: C.salmon,
+            border: `3px solid ${C.ink}`,
+            boxShadow: SHADOW_SM,
+            padding: '7px 16px',
+            fontFamily: FONT_MONO,
+            fontWeight: 700,
+            fontSize: 15,
+            letterSpacing: 0.3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <span style={{ width: 11, height: 11, background: C.red, border: `2px solid ${C.ink}` }} />
+          A ROOM FULL OF DEFENSIVE HOSTILITY
         </div>
       </div>
     </div>

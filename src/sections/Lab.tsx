@@ -270,7 +270,7 @@ export const LabSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat,
       </div>
 
       {/* reels + person + cup */}
-      <div style={{ position: 'absolute', left: 8, top: 462, display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+      <div style={{ position: 'absolute', left: 8, top: 420, display: 'flex', alignItems: 'flex-end', gap: 12 }}>
         <div style={{ display: 'flex', gap: 10 }}>
           <TapeReel label="A" active={!takeB} frame={frame} offset={0} />
           <TapeReel label="B" active={takeB} frame={frame} offset={40} />
@@ -355,14 +355,20 @@ export const LabSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat,
               <AudienceRow count={5} width={170} ready={crowd} color={C.tealLight} />
             </div>
             <div style={{ position: 'absolute', left: 240, bottom: 0, display: 'flex', gap: 62, alignItems: 'flex-end' }}>
-              <Bar label="FLAWLESS" height={104} color={C.grey} value="58" grow={bars} />
-              <Bar label="+ COFFEE" height={104} color="#4E9E8F" value={`${Math.round(58 + jump * 34)}`} grow={bars * (1 + jump * 0.58)} />
+              <Bar label="FLAWLESS" height={92} color={C.grey} value="58" grow={bars} />
+              <Bar
+                label="+ COFFEE"
+                height={92}
+                color="#4E9E8F"
+                value={`${Math.round(58 + jump * 34)}`}
+                grow={bars * (1 + jump * 0.5)}
+              />
             </div>
             <div
               style={{
                 position: 'absolute',
-                left: 396,
-                top: -22,
+                left: 542,
+                top: 54,
                 opacity: jump,
                 transform: `scale(${0.7 + jump * 0.3}) rotate(4deg)`,
               }}
@@ -394,8 +400,8 @@ export const LabSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat,
       <div
         style={{
           position: 'absolute',
-          left: 150,
-          top: 430,
+          left: 430,
+          top: 596,
           opacity: stamp,
           transform: `rotate(-6deg) scale(${0.85 + stamp * 0.15})`,
           pointerEvents: 'none',
@@ -406,8 +412,8 @@ export const LabSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat,
         </Stamp>
       </div>
 
-      <div style={{ position: 'absolute', left: 8, top: 700 }}>
-        <HandLabel size={19} rotate={-1.5} underline={false}>
+      <div style={{ position: 'absolute', left: 420, top: 558 }}>
+        <HandLabel size={19} rotate={-1.2} underline={false}>
           THE SAME GENIUS, ONE HUMAN SLIP
         </HandLabel>
       </div>

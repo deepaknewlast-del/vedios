@@ -14,7 +14,7 @@ import {
   Star,
 } from '../art/Sketch';
 import { C, FONT_HEAD, FONT_MONO, SHADOW_SM, tint } from '../theme';
-import type { Beat } from '../timeline';
+import { BEATS, type Beat } from '../timeline';
 
 const GRID = { x: 118, y: 6, w: 900, h: 470 };
 const HALF_W = GRID.w / 2;
@@ -122,8 +122,10 @@ export const MatrixSection: React.FC<{ beat: Beat; localFrame: number }> = ({ be
   const admiration = revealAt(s, 10, localFrame);
   const catchCard = revealAt(s, 11, localFrame, true, 36);
 
-  const shiftStart = beat.startFrame + 14;
-  const shiftEnd = beat.startFrame + beat.frames - 18;
+  // Fixed migration window: the "one spilled cup" beat → the "admiration" beat.
+  const mBeats = BEATS.filter((b) => b.section.id === 'matrix');
+  const shiftStart = (mBeats[9] ?? beat).startFrame + 12;
+  const shiftEnd = (mBeats[10] ?? beat).startFrame + 24;
   const shift = interpolate(frame, [shiftStart, shiftEnd], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
@@ -465,17 +467,23 @@ export const MatrixSection: React.FC<{ beat: Beat; localFrame: number }> = ({ be
                 <div style={{ fontFamily: FONT_MONO, fontSize: 12.5, fontWeight: 700, marginTop: 8 }}>
                   58 → 31 / NOT A SINGLE POINT UP
                 </div>
-                <div style={{ marginTop: 14, display: 'flex', justifyContent: 'flex-end' }}>
+                <div style={{ marginTop: 14, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 14 }}>
+                  <QuestionMark size={30} rotate={10} pop={catchCard} />
+                  <BangMark size={30} rotate={-8} pop={catchCard} />
                   <Callout bg={C.mustard} rotate={-1.5}>
                     CONTINUES IN PART 2 →
                   </Callout>
                 </div>
               </div>
             </div>
-            <div style={{ position: 'absolute', right: 20, bottom: 12, display: 'flex', gap: 10 }}>
-              <QuestionMark size={34} rotate={10} pop={catchCard} />
-              <BangMark size={34} rotate={-8} pop={catchCard} />
-            </div>
+          </div>
+          <div style={{ position: 'absolute', left: 404, bottom: 8, opacity: catchCard }}>
+            <JudgeFigure size={136} accent={C.teal} />
+          </div>
+          <div style={{ position: 'absolute', left: 512, bottom: 118, opacity: catchCard }}>
+            <HandLabel size={17} rotate={-1.5} underline={false}>
+              AVERAGE GENIUS
+            </HandLabel>
           </div>
         </ComicPanel>
       </div>
