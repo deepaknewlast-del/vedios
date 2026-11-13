@@ -267,8 +267,8 @@ export const Part1: React.FC = () => {
       <div
         style={{
           position: 'absolute',
-          right: 96,
-          top: RIBBON.top + 12,
+          right: 100,
+          top: RIBBON.top - 44,
           opacity: endP,
           zIndex: 6,
           transform: `translateY(${(1 - endP) * 12}px)`,

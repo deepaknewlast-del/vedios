@@ -238,12 +238,13 @@ export const LabSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat,
             style={{
               position: 'absolute',
               left: 10,
-              top: 8,
+              bottom: 7,
               fontFamily: FONT_MONO,
               fontWeight: 700,
-              fontSize: 12,
+              fontSize: 11,
               color: C.tealLight,
               letterSpacing: 0.8,
+              opacity: 0.85,
             }}
           >
             CH1 / VOICE TRACE
@@ -252,10 +253,10 @@ export const LabSection: React.FC<{ beat: Beat; localFrame: number }> = ({ beat,
             style={{
               position: 'absolute',
               right: 10,
-              bottom: 7,
+              top: 7,
               fontFamily: FONT_MONO,
               fontWeight: 700,
-              fontSize: 12,
+              fontSize: 11,
               color: C.mustard,
             }}
           >

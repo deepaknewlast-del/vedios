@@ -38,7 +38,7 @@ const QUADS = [
   {
     key: 'envy',
     label: 'ENVY / COLD',
-    desc: 'RESPECTED, RESENTED',
+    desc: 'RESPECT, NO WARMTH',
     color: C.salmon,
     x: 1,
     y: 1,
@@ -229,6 +229,7 @@ export const MatrixSection: React.FC<{ beat: Beat; localFrame: number }> = ({
                       fontSize: 13,
                       letterSpacing: 0.9,
                       marginTop: 7,
+                      maxWidth: 300,
                       opacity: 0.8,
                     }}
                   >
