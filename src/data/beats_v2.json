@@ -1,0 +1,21 @@
+{
+  "fps": 60,
+  "beats": [
+    { "id": "b1",  "text": "You're in the room. Two candidates. Same job. Same questions. Same answers." },
+    { "id": "b2",  "text": "Candidate A is perfect. Zero hesitation. Zero flaws. Every answer lands exactly where it should." },
+    { "id": "b3",  "text": "Candidate B is just as sharp. But halfway through, he admits a screw up from last quarter. And laughs at himself." },
+    { "id": "b4",  "text": "Logic says A wins. Your gut says B. And your gut is right." },
+    { "id": "b5",  "text": "B gets the offer. B gets the allies. B gets the trust. And A? A quietly fills the room with hostility." },
+    { "id": "b6",  "text": "Nineteen sixty six. Elliot Aronson wants to know exactly why." },
+    { "id": "b7",  "text": "So he records two interviews. Tape one. A genius. Ninety two percent. Flawless." },
+    { "id": "b8",  "text": "Tape two. The same genius. The same ninety two percent. But at the very end, he drops a cup of coffee all over himself." },
+    { "id": "b9",  "text": "Listeners rate them both. The clumsy one doesn't lose respect. He gains it." },
+    { "id": "b10", "text": "Aronson called it the pratfall effect. And it is not about being bad at your job. It is about how status actually works." },
+    { "id": "b11", "text": "Researchers map us on two axes. Competence, and warmth." },
+    { "id": "b12", "text": "Perfect competence without warmth reads as a threat. It makes everyone else feel smaller. They respect your skill, and quietly root for your fall." },
+    { "id": "b13", "text": "That is the envy quadrant. The spill broke the signal. Human. Safe. Approachable. Same competence, completely different room." },
+    { "id": "b14", "text": "But here is the catch. Aronson ran the same spill on an average performer. Likability did not rise. It crashed." },
+    { "id": "b15", "text": "So if you are the smartest person in the room, drop something. Ask the obvious question. Let them see the seam." },
+    { "id": "b16", "text": "Perfection is a wall. A small honest mistake is a door. Choose the door." }
+  ]
+}
