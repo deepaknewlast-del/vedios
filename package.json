@@ -1,0 +1,29 @@
+{
+  "name": "theory-of-behaviour-part1",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Part 1 of 'Why Being Too Competent Makes People Secretly Resent You' — a 1980s retro behavioral textbook video built with Remotion.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "remotion studio src/index.ts",
+    "studio": "remotion studio src/index.ts",
+    "audio": "bash scripts/generate-audio.sh",
+    "render": "bash scripts/render.sh",
+    "build": "bash scripts/render.sh",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/comic-neue": "^5.2.6",
+    "@fontsource/space-mono": "^5.2.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@sparticuz/chromium": "^153.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}
