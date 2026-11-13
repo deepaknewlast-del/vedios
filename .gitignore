@@ -1,0 +1,6 @@
+node_modules/
+.tmpnpm/
+ai-video/out/video_only.mp4
+ai-video/out/render.log
+.arena/
+__pycache__/
